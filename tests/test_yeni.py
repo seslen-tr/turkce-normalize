@@ -109,7 +109,7 @@ class Araliklar(unittest.TestCase):
     def test_bozulmamasi_gerekenler(self):
         self.assertEqual(normalize("0212-555-44-33"),
                          "sıfır iki bir iki beş beş beş dört dört üç üç")
-        self.assertEqual(normalize("Skor 3-1 bitti."), "Skor üç-bir bitti.")       # a ≥ b: aralık değil
+        self.assertEqual(normalize("Skor 3-1 bitti."), "Skor üç bir bitti.")       # a ≥ b: aralık değil
         self.assertRegex(normalize("TR33 0006 1005 9700 6410 0000 01"), r"^te re üç üç sıfır")
         self.assertEqual(normalize("Pafta G22-b-14c-2d"), "Pafta ge yirmi iki be on dört ce iki de")
 
@@ -118,7 +118,7 @@ class Kisaltmalar(unittest.TestCase):
     def test_harf_harf(self):
         self.assertEqual(normalize("TBMM toplandı."), "te be me me toplandı.")
         self.assertEqual(normalize("TRT haberleri"), "te re te haberleri")
-        self.assertEqual(normalize("AKP ve CHP"), "a ke pe ve ce he pe")
+        self.assertEqual(normalize("AKP ve CHP"), "a ka pe ve ce he pe")
         self.assertEqual(normalize("ÖSYM sınavı"), "ö se ye me sınavı")
         self.assertEqual(normalize("ĞÜŞ"), "yumuşak ge ü şe")
         self.assertEqual(normalize("WWF ve XQ"), "çift ve çift ve fe ve iks kü")
@@ -236,3 +236,31 @@ class KomutSatiri(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class Eklenenler(unittest.TestCase):
+    """03.10: K "ka", ekli kesir, noktalı ondalık/saat, sürüm, 24/7, skor, ISO ve tireli tarih."""
+
+    def test_k_harfi(self):
+        self.assertEqual(normalize("PKK ve TDK"), "pe ka ka ve te de ka")
+
+    def test_ekli_kesir(self):
+        self.assertEqual(normalize("Pastanın 1/2'si, 1/4'ü ve 3/4'ü kaldı."),
+                         "Pastanın yarısı, çeyreği ve dörtte üçü kaldı.")
+        self.assertEqual(normalize("1/2'sini aldım"), "yarısını aldım")
+
+    def test_noktali_ondalik_ve_saat(self):
+        self.assertEqual(normalize("3.5 milyon"), "üç virgül beş milyon")
+        self.assertEqual(normalize("3.500 lira"), "üç bin beş yüz lira")
+        self.assertEqual(normalize("Saat 14.30'da"), "Saat on dört otuzda")
+        self.assertEqual(normalize("pi 3.14"), "pi üç virgül on dört")
+
+    def test_surum(self):
+        self.assertEqual(normalize("1.2.3 sürümü"), "bir nokta iki nokta üç sürümü")
+        self.assertEqual(normalize("1.250.000 kişi"), "bir milyon iki yüz elli bin kişi")
+
+    def test_24_7_skor_tarih(self):
+        self.assertEqual(normalize("24/7 açık"), "yirmi dört yedi açık")
+        self.assertEqual(normalize("Maç 3-1 bitti."), "Maç üç bir bitti.")
+        self.assertEqual(normalize("2026-10-03"), "üç ekim iki bin yirmi altı")
+        self.assertEqual(normalize("03-10-2026"), "üç ekim iki bin yirmi altı")

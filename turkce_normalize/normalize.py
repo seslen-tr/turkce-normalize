@@ -275,7 +275,14 @@ _SAAT_KALIBI = r"(?:[01]?\d|2[0-3]):[0-5]\d"
 _ZAMAN_ARALIGI = re.compile(
     rf"\b({_TARIH_KALIBI}|{_SAAT_KALIBI})\s?[-–]\s?({_TARIH_KALIBI}|{_SAAT_KALIBI})\b", _A
 )
-_TARIH = re.compile(r"\b(\d{1,2})[./](\d{1,2})[./](\d{4})\b", _A)
+_TARIH = re.compile(r"\b(\d{1,2})([./-])(\d{1,2})\2(\d{4})\b", _A)   # 15.03.2026, 15/03/2026, 15-03-2026
+_ISO_TARIH = re.compile(r"\b(\d{4})-(\d{2})-(\d{2})\b", _A)              # 2026-03-15
+# Türkçede saat sık sık noktayla yazılır: "saat 14.30". Yalnız "saat" sözcüğünden sonra (3.14 ondalıktır).
+_SAAT_NOKTALI = re.compile(r"(?<=\b[Ss]aat )([01]?\d|2[0-3])\.([0-5]\d)\b")
+# Sürüm numarası: noktalı ve en az üç grup; grupların hepsi üç rakamlı değilse binlik değildir ("1.2.3").
+_SURUM = re.compile(r"(?<![\d.,])\d+(?:\.\d+){2,}(?![\d.])", _A)
+# İngilizce usulü ondalık nokta: ardında tam 3 rakam yoksa binlik ayırıcı değildir ("3.5", "2.75").
+_NOKTALI_ONDALIK = re.compile(r"(?<![\d.,])(\d+)\.(\d{1,2}|\d{4,})(?![\d.])", _A)
 _SAAT = re.compile(r"\b([01]?\d|2[0-3]):([0-5]\d)\b", _A)
 
 
@@ -285,10 +292,24 @@ def _iban_oku(e: re.Match) -> str:
 
 
 def _tarih_oku(e: re.Match) -> str:
-    gun, ay = int(e.group(1)), int(e.group(2))
+    gun, ay = int(e.group(1)), int(e.group(3))
     if ay < 1 or ay > 12 or gun < 1 or gun > 31:
         return e.group(0)
-    return f"{sayi_oku(gun)} {AYLAR[ay]} {sayi_oku(e.group(3))}"
+    return f"{sayi_oku(gun)} {AYLAR[ay]} {sayi_oku(e.group(4))}"
+
+
+def _surum_oku(e: re.Match) -> str:
+    gruplar = e.group(0).split(".")
+    if len(gruplar[0]) <= 3 and all(len(g) == 3 for g in gruplar[1:]):
+        return e.group(0)                            # "1.250.000": binlik ayırıcı
+    return " nokta ".join(sayi_oku(g) for g in gruplar)   # "1.2.3" -> "bir nokta iki nokta üç"
+
+
+def _iso_tarih_oku(e: re.Match) -> str:
+    yil, ay, gun = e.group(1), int(e.group(2)), int(e.group(3))
+    if ay < 1 or ay > 12 or gun < 1 or gun > 31:
+        return e.group(0)
+    return f"{sayi_oku(gun)} {AYLAR[ay]} {sayi_oku(yil)}"
 
 
 def _saat_oku(e: re.Match) -> str:
@@ -307,7 +328,7 @@ def _saat_oku(e: re.Match) -> str:
 # 9) Kesirler
 # --------------------------------------------------------------------------
 
-_KESIR = re.compile(r"(?<![\w.,/:\-–])(?:(\d+) )?([1-9]\d*)/([1-9]\d*)(?![\w/]|[.,]\d)")
+_KESIR = re.compile(r"(?<![\w.,/:\-–])(?:(\d+) )?([1-9]\d*)/([1-9]\d*)(?![\w/]|[.,]\d)(?:['’]([^\W\d_]+))?")
 _KESIR_KARAKTERI = re.compile(r"(?<![\w.,])(?:(\d+)[ \t]?)?([½¼¾])")
 _KESIR_KARAKTERLERI = {"½": (1, 2), "¼": (1, 4), "¾": (3, 4)}
 # Adreste "No: 5/7" bir kesir değil, kapı numarasıdır ve "beş bölü yedi" okunur.
@@ -324,13 +345,24 @@ def _kesir_metni(pay: int, payda: int, tam: Optional[str], ekli: bool) -> str:
     return f"{sayi_oku(tam)} tam {kesir}" if tam else kesir
 
 
+_UYUM_KALIN_DUZ = str.maketrans("iüueöo", "ıııaaa")      # yarı + ek: si → sı, ye → ya
+_UYUM_INCE_DUZ = str.maketrans("ıuüaoö", "iiieee")       # çeyrek + ek: ü → i
+
+
 def _kesir_oku(e: re.Match) -> str:
-    tam, pay, payda = e.group(1), int(e.group(2)), int(e.group(3))
+    tam, pay, payda, ek = e.group(1), int(e.group(2)), int(e.group(3)), e.group(4) or ""
     if _ADRES_ONCESI.search(_oncesi(e)):
-        return (f"{tam} " if tam else "") + f"{sayi_oku(pay)} bölü {sayi_oku(payda)}"
+        return (f"{tam} " if tam else "") + f"{sayi_oku(pay)} bölü {sayi_oku(payda)}" + ek
+    if (pay, payda) == (24, 7) and not tam:
+        return "yirmi dört yedi" + ek                # "24/7 açık"
     if pay >= payda or payda < 2:
-        return e.group(0)                            # "24/7", "15/03": kesir değil
-    return _kesir_metni(pay, payda, tam, _kesme_sonrasi_harf(e))
+        return e.group(0)                            # "15/03": kesir değil
+    if ek and not tam and (pay, payda) == (1, 2):
+        return "yarı" + turkce_kucuk(ek).translate(_UYUM_KALIN_DUZ)   # "1/2'si" -> "yarısı"
+    if ek and not tam and (pay, payda) == (1, 4):
+        ek = turkce_kucuk(ek).translate(_UYUM_INCE_DUZ)
+        return ("çeyreğ" if ek[0] in "aeıioöuü" else "çeyrek") + ek    # "1/4'ü" -> "çeyreği"
+    return _kesir_metni(pay, payda, tam, bool(ek)) + turkce_kucuk(ek)   # "3/4'ü" -> "dörtte üçü"
 
 
 def kesirleri_oku(metin: str) -> str:
@@ -359,7 +391,9 @@ def _aralik_oku(e: re.Match) -> str:
         return e.group(0)                            # "0532-123": kod ya da numara
     a, b = sayiyi_coz(a_metin), sayiyi_coz(b_metin)
     if a >= b:
-        return e.group(0)                            # "3-1" skor olabilir, dokunulmaz
+        if b <= 99 and a <= 99:
+            return f"{sayi_oku(a)} {sayi_oku(b)}" + (nokta or "")   # skor: "3-1" -> "üç bir"
+        return e.group(0)
     if nokta and sonraki.islower():
         return f"{sira_oku(a)} ile {sira_oku(b)}"    # "3-5. maddeler"
     if b <= 100:
@@ -545,8 +579,10 @@ def normalize(
 
     # 7) Tarih ve saat. Önce aralıklar: "14:30-15:30" -> "14:30 ile 15:30"
     m = _ZAMAN_ARALIGI.sub(r"\1 ile \2", m)
-    m = _TARIH.sub(_tarih_oku, m)                    # 15.03.2026 / 15/03/2026
+    m = _ISO_TARIH.sub(_iso_tarih_oku, m)            # 2026-03-15 (aralık kuralından önce)
+    m = _TARIH.sub(_tarih_oku, m)                    # 15.03.2026 / 15/03/2026 / 15-03-2026
     m = _SAAT.sub(_saat_oku, m)
+    m = _SAAT_NOKTALI.sub(_saat_oku, m)              # "saat 14.30"
 
     # 8) Simgeler — "2+2", "=", "&", "±", "45°"
     m = simgeleri_oku(m)
@@ -582,8 +618,10 @@ def normalize(
     # 17) Sıra sayısı — "3. madde"
     m = _SIRA.sub(_sira_oku, m)
 
-    # 18) Ondalık sayı — 3,5
+    # 18) Ondalık sayı — 3,5; İngilizce usulü "3.5" de (ardında tam 3 rakam yoksa binlik değildir)
     m = _ONDALIK.sub(lambda e: ondalik_oku(sayiyi_coz(e.group(1)), e.group(2)), m)
+    m = _SURUM.sub(_surum_oku, m)
+    m = _NOKTALI_ONDALIK.sub(lambda e: ondalik_oku(int(e.group(1)), e.group(2)), m)
 
     # 19) Kalan tam sayılar — 1.250 / 42
     m = _TAM_SAYI.sub(lambda e: sayi_oku(sayiyi_coz(re.sub(r"\.$", "", e.group(0)))), m)

@@ -179,7 +179,8 @@ olarak okunur:
   ç, f, h, k, p, s, ş, t'den sonra **te/ta**, diğerlerinde **de/da**.
 - Tam sayılı kesir: `2 1/2` → iki buçuk, `3 3/4` → üç tam dörtte üç; `½ ¼ ¾`
   karakterleri de okunur.
-- Yalnızca **bayağı kesirler** (pay < payda) okunur. `24/7`, `15/03` dokunulmaz.
+- Yalnızca **bayağı kesirler** (pay < payda) okunur; `15/03` dokunulmaz. `24/7` → yirmi dört yedi.
+- Ekli kesir: `1/2'si` → yarısı, `1/4'ü` → çeyreği, `3/4'ü` → dörtte üçü.
 - Tarih (`15/03/2026`) ve ölçek (`1/25.000`, `1:1000`) kuralları önce çalışır.
 - Adreste kapı numarası: `No: 5/7` → No: beş bölü yedi.
 
@@ -192,16 +193,17 @@ olarak okunur:
 - Sıra sayısı aralığı: `3-5. maddeler` → üçüncü ile beşinci maddeler.
 - Saat ve tarih aralığı: `14:30-15:30` → on dört otuz ile on beş otuz;
   yüzde aralığı: `%10-20` → yüzde on ile yirmi.
-- İlki büyük ya da eşitse (`3-1` skor olabilir), sıfırla başlıyorsa (kod) veya
-  ikiden fazla sayı tireyle bağlıysa (`0212-555-44-33`) aralık sayılmaz.
+- İlki büyük ya da eşitse skor gibi okunur: `3-1` → üç bir. Sıfırla başlıyorsa (kod)
+  veya ikiden fazla sayı tireyle bağlıysa (`0212-555-44-33`) aralık sayılmaz.
 - Önünde harf/rakam olmayan tire eksi işaretidir: `-5 derece` → eksi beş derece.
 
 ### Büyük harfli kısaltmalar
 
 - 2–5 büyük harften oluşan tokenlar Türkçe harf adlarıyla okunur:
-  `TBMM` → te be me me, `AKP` → a ke pe. Harf adları: a, be, ce, çe, de, e, fe,
-  ge, yumuşak ge, he, ı, i, je, ke, le, me, ne, o, ö, pe, re, se, şe, te, u, ü,
-  ve, ye, ze; Q kü, W çift ve, X iks.
+  `TBMM` → te be me me, `AKP` → a ka pe. Harf adları: a, be, ce, çe, de, e, fe,
+  ge, yumuşak ge, he, ı, i, je, ka, le, me, ne, o, ö, pe, re, se, şe, te, u, ü,
+  ve, ye, ze; Q kü, W çift ve, X iks. K kısaltmalardaki yaygın okunuşla "ka"dır
+  (TDK alfabesinde "ke"); `HARF_OKUNUSU["K"] = "ke"` ile değiştirilebilir.
 - Kesmeden sonraki ek okunuşa bitişir: `TBMM'de` → te be me mede,
   `ABD'li` → a be deli.
 - Kelime gibi okunan kısaltmalar (`KELIME_GIBI_OKUNANLAR`) harf harf okunmaz,
@@ -244,7 +246,7 @@ Sıra rastgele değildir; bütün bir birim olan gösterimler sayı kurallarınd
 önce gelir, yoksa içlerindeki rakamlar genel kurallara yem olur:
 
 1. e-posta ve web adresi → 2. sıcaklık → 3. coğrafi gösterimler →
-4. telaffuz sözlüğü → 5. IBAN → 6. telefon → 7. tarih ve saat →
+4. telaffuz sözlüğü → 5. IBAN → 6. telefon → 7. tarih ve saat (ISO ve tireli tarih dahil) →
 8. simgeler → 9. kesirler → 10. aralıklar → 11. eksi sayılar → 12. para →
 13. yüzde → 14. kısaltmalar ve birimler → 15. Roma rakamları →
 16. büyük harfli kısaltmalar → 17. sıra sayıları → 18. ondalık →
@@ -254,8 +256,10 @@ Sıra rastgele değildir; bütün bir birim olan gösterimler sayı kurallarınd
 
 - Ek uyumu yapılmaz: `5'te` → beşte doğru çıkar çünkü ek zaten okunuşa göre
   yazılmıştır; ama yanlış yazılmış ekler düzeltilmez.
-- Nokta binlik ayırıcıdır: `3.5` "otuz beş" okunur (Türkçe yazımda ondalık
-  ayırıcı virgüldür).
+- Nokta, ardından tam üç rakam geliyorsa binlik ayırıcıdır (`3.500` → üç bin beş yüz);
+  aksi halde İngilizce usulü ondalık sayılır (`3.5` → üç virgül beş). Üç ve daha fazla
+  noktalı grupta üç rakamlı olmayan grup varsa sürüm numarasıdır (`1.2.3` → bir nokta iki
+  nokta üç). Noktalı saat yalnız "saat" sözcüğünden sonra tanınır (`saat 14.30`).
 - Sıra sayısı ve Roma rakamı için ardından bir kelime gelmesi gerekir; cümle
   sonundaki `XIV.` dokunulmaz.
 - Cümle başındaki büyük harf, dönüştürülen kelimeyle birlikte kaybolur
@@ -264,9 +268,7 @@ Sıra rastgele değildir; bütün bir birim olan gösterimler sayı kurallarınd
   harfli sıradan kelimeler harf harf okunabilir; tamamı büyük harfle yazılmış
   metinlerde `kisaltma_harf_harf=False` kullanın. Tek harfli Roma rakamı bir
   ismin baş harfiyle karışabilir (`romanı V. Hugo yazdı`).
-- Ek almış kesirlerde (`1/2'si`) ek paya bağlanır: "ikide birsi".
-- `24/7` gibi bileşik kesirler, ISO tarih (`2026-03-15`), skor (`3-1`) ve
-  tireli tarih (`15-03-2026`) özel olarak okunmaz.
+- Tam sayılı ekli kesir (`2 1/2'si`) düzeltilmez.
 - Şemasız alan adlarında Türkçe karakter (IDN) desteklenmez.
 - İngilizce normalizasyon kapsam dışıdır; metin Türkçe kabul edilir.
 

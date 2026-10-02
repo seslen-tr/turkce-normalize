@@ -31,7 +31,8 @@ SIRA = {
 #: uzantısı ("tr" -> "te re") hep bu tabloyu kullanır.
 HARF_OKUNUSU = {
     "A": "a", "B": "be", "C": "ce", "Ç": "çe", "D": "de", "E": "e", "F": "fe", "G": "ge",
-    "Ğ": "yumuşak ge", "H": "he", "I": "ı", "İ": "i", "J": "je", "K": "ke", "L": "le",
+    # K: kısaltmalarda yaygın okunuş "ka" (KDV → ka de ve, PKK → pe ka ka); TDK alfabesinde "ke".
+    "Ğ": "yumuşak ge", "H": "he", "I": "ı", "İ": "i", "J": "je", "K": "ka", "L": "le",
     "M": "me", "N": "ne", "O": "o", "Ö": "ö", "P": "pe", "R": "re", "S": "se", "Ş": "şe",
     "T": "te", "U": "u", "Ü": "ü", "V": "ve", "Y": "ye", "Z": "ze",
     # Türk alfabesinde olmayan ama kısaltmalarda geçen harfler
@@ -52,7 +53,7 @@ def turkce_kucuk(s: str) -> str:
 
 
 def harf_oku(harf: str) -> str:
-    """Tek harfi okur: "K" -> "ke", "ğ" -> "yumuşak ge". Bilinmeyen harf küçülür."""
+    """Tek harfi okur: "K" -> "ka", "ğ" -> "yumuşak ge". Bilinmeyen harf küçülür."""
     return HARF_OKUNUSU.get(turkce_buyuk(harf), turkce_kucuk(harf))
 
 
