@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "turkce-normalize"
+version = "0.1.0"
+description = "TTS için Türkçe metin normalizasyonu: sayı, tarih, saat, para, kısaltma, Roma rakamı, kesir, e-posta ve adres okunuşu."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Mehmet Veysel Delibaş" }]
+keywords = ["türkçe", "turkish", "tts", "text-normalization", "normalizasyon", "speech"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: Turkish",
+    "Operating System :: OS Independent",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+    "Topic :: Text Processing :: Linguistic",
+]
+dependencies = []
+
+[project.scripts]
+turkce-normalize = "turkce_normalize.__main__:main"
+
+[tool.setuptools]
+packages = ["turkce_normalize"]
