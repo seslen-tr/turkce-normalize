@@ -264,3 +264,7 @@ class Eklenenler(unittest.TestCase):
         self.assertEqual(normalize("Maç 3-1 bitti."), "Maç üç bir bitti.")
         self.assertEqual(normalize("2026-10-03"), "üç ekim iki bin yirmi altı")
         self.assertEqual(normalize("03-10-2026"), "üç ekim iki bin yirmi altı")
+
+    def test_yuzde_cumle_sonu(self):
+        self.assertEqual(normalize("KDV %18."), "katma değer vergisi yüzde on sekiz.")
+        self.assertEqual(normalize("%1.250 arttı"), "yüzde bin iki yüz elli arttı")

@@ -414,7 +414,8 @@ def araliklari_oku(metin: str) -> str:
 # --------------------------------------------------------------------------
 
 _PARA = re.compile(r"\b([\d.]+?)(?:,(\d{1,2}))?\s?(?:₺|TL\b|lira\b)", _A)
-_YUZDE = re.compile(r"%\s?([\d.]+)(?:,(\d+))?", _A)
+# Sayı: binlik gruplu ya da düz; "[\d.]+" cümle sonu noktasını da yutuyordu ("%18." → nokta kayboluyordu)
+_YUZDE = re.compile(r"%\s?(\d{1,3}(?:\.\d{3})+|\d+)(?:,(\d+))?", _A)
 _SOZLUK_DESENLERI = [
     (re.compile(r"(?<![^\W_])" + re.escape(kisa) + r"(?![^\W_])"), sozluk[kisa])
     for sozluk in (KISALTMALAR, BIRIMLER)
