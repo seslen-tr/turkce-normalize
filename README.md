@@ -1,5 +1,7 @@
 # turkce-normalize
 
+> **English:** Turkish text normalization for text-to-speech. Expands numbers, dates, times, currency, abbreviations, Roman numerals, fractions, e-mail and web addresses into how they are read aloud, following Turkish rules (`14:30'da` → `on dört otuzda`). No dependencies, Python 3.9+, includes an abbreviation-aware sentence splitter for streaming LLM output.
+
 TTS (metinden sese) modelleri için Türkçe metin normalizasyonu.
 
 Chatterbox, XTTS, Piper, StyleTTS2 gibi açık kaynak modeller SSML desteklemez
