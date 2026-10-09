@@ -21,6 +21,11 @@ classifiers = [
 ]
 dependencies = []
 
+[project.urls]
+Homepage = "https://github.com/seslen-tr/turkce-normalize"
+Source = "https://github.com/seslen-tr/turkce-normalize"
+Issues = "https://github.com/seslen-tr/turkce-normalize/issues"
+
 [project.scripts]
 turkce-normalize = "turkce_normalize.__main__:main"
 
