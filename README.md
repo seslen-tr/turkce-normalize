@@ -21,7 +21,8 @@ Toplantı 14:30'da, %18 KDV dahil 1.250,50 ₺.
 ## Kurulum
 
 ```bash
-pip install .            # depo kökünde
+pip install turkce-normalize     # PyPI
+pip install .                    # ya da depo kökünde, kaynaktan
 ```
 
 ## Kullanım
@@ -48,6 +49,10 @@ python -m turkce_normalize "Tarifte 1/2 kilo un, 3/4 su bardağı süt var."
 echo "3-5 kişilik ekip -5 derecede çalıştı." | python -m turkce_normalize
 # üç beş kişilik ekip eksi beş derecede çalıştı.
 ```
+
+Paket kurulunca aynı iş `turkce-normalize "metin"` komutuyla da yapılır. Metin verilmezse
+standart girdi satır satır okunur. `--cografi-kapali` koordinat, ölçek, pafta ve EPSG
+kurallarını kapatır (`cografi=False`); `--version` sürümü yazar.
 
 ### Seçenekler
 
@@ -277,12 +282,38 @@ Sıra rastgele değildir; bütün bir birim olan gösterimler sayı kurallarınd
 ## Testler
 
 ```bash
-python -m unittest discover -s tests
+python -m unittest discover -s tests     # ya da: pytest -q (CI'daki gibi)
 ```
 
 `tests/test_parite.py` kaynak TypeScript projesindeki testlerin birebir
 karşılığıdır (beklenen çıktılar aynı); `tests/test_yeni.py` bu pakette
-eklenen özellikleri ve yanlış pozitifleri sabitler.
+eklenen özellikleri ve yanlış pozitifleri sabitler. GitHub Actions testleri
+Python 3.9 ve 3.12'de çalıştırır.
+
+Bu testlerden derlenen 128 örnek [turkce-tts-sinav](https://github.com/seslen-tr/turkce-tts-sinav)
+içinde `normalizasyon_sinavi` olarak başka sistemlerin ölçülmesi için de yayımlanır
+(bu paket 128/128 geçer).
+
+## Düzen
+
+| Dosya | İçerik |
+|---|---|
+| `turkce_normalize/normalize.py` | `normalize()` ve kural sırası; kısaltma, birim, Roma rakamı, kesir, aralık, simge, e-posta/adres kuralları |
+| `turkce_normalize/sayilar.py` | sayı, sıra sayısı, ondalık okuma; harf adları, bulunma eki, Türkçe büyük/küçük harf |
+| `turkce_normalize/cografi.py` | koordinat, ölçek, pafta, EPSG/UTM, alan birimleri |
+| `turkce_normalize/telaffuz.py` | gömülü CBS/yazılım telaffuz sözlüğü, `sozluk_birlestir` |
+| `turkce_normalize/cumle.py` | kısaltma farkında cümle ayırıcı (LLM akışı) |
+| `turkce_normalize/isaretler.py` | `[dur]` duraklama işaretleri |
+| `turkce_normalize/__main__.py` | komut satırı |
+| `tests/` | `test_parite.py`, `test_yeni.py` |
+
+## Kardeş projeler
+
+[seslen-tts](https://github.com/seslen-tr/seslen-tts) bu paketi
+[turkce-vurgu](https://github.com/seslen-tr/turkce-vurgu) üzerinden kullanır: `pip install "turkce-vurgu[tam]"`
+kuruluysa metin okunuşa çevrilmeden önce bu paketle hazırlanır. Diğerleri:
+[turkce-duygu](https://github.com/seslen-tr/turkce-duygu) · [turkce-uslup](https://github.com/seslen-tr/turkce-uslup) ·
+[turkce-plbert](https://github.com/seslen-tr/turkce-plbert) · [turkce-tts-sinav](https://github.com/seslen-tr/turkce-tts-sinav)
 
 ## Lisans
 
@@ -310,4 +341,5 @@ normalize("Toplantı 14:30'da, %18 KDV dahil 1.250,50 ₺.")
 # 'Toplantı on dört otuzda, yüzde on sekiz katma değer vergisi dahil bin iki yüz elli lira elli kuruş.'
 ```
 
-CLI: `python -m turkce_normalize "metin"`. Tests: `python -m unittest discover -s tests`. License: MIT.
+Install: `pip install turkce-normalize`. CLI: `turkce-normalize "metin"` or `python -m turkce_normalize "metin"`.
+Tests: `python -m unittest discover -s tests`. License: MIT.
