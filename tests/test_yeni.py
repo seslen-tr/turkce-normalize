@@ -268,3 +268,24 @@ class Eklenenler(unittest.TestCase):
     def test_yuzde_cumle_sonu(self):
         self.assertEqual(normalize("KDV %18."), "katma değer vergisi yüzde on sekiz.")
         self.assertEqual(normalize("%1.250 arttı"), "yüzde bin iki yüz elli arttı")
+
+
+class ParaEki(unittest.TestCase):
+    """Ek "TL"ye göre yazılır (TL'den, TL'ye); okunuşta lira / kuruşa uymalı."""
+
+    def test_lira(self):
+        self.assertEqual(normalize("20 TL'ye"), "yirmi liraya")
+        self.assertEqual(normalize("100 TL'yi"), "yüz lirayı")
+        self.assertEqual(normalize("50 TL'lik"), "elli liralık")
+        self.assertEqual(normalize("200 TL'nin"), "iki yüz liranın")
+        self.assertEqual(normalize("5 ₺'den"), "beş liradan")
+
+    def test_kurus(self):
+        self.assertEqual(normalize("10,50 TL'den"), "on lira elli kuruştan")
+        self.assertEqual(normalize("5,25 TL'yi"), "beş lira yirmi beş kuruşu")
+        self.assertEqual(normalize("1,50 TL'si"), "bir lira elli kuruşu")
+        self.assertEqual(normalize("Fiyatı 3.499,90 TL'den 2.750 TL'ye düştü."),
+                         "Fiyatı üç bin dört yüz doksan dokuz lira doksan kuruştan iki bin yedi yüz elli liraya düştü.")
+
+    def test_zaten_uyumlu(self):
+        self.assertEqual(normalize("3.500 lira'dan"), "üç bin beş yüz liradan")

@@ -26,7 +26,7 @@ from .sayilar import (
 )
 from .telaffuz import CBS_TERIMLERI, VARSAYILAN_SOZLUK, sozluk_birlestir, telaffuz_uygula
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 __all__ = [
     "normalize",

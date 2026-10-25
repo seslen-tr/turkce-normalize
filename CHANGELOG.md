@@ -1,5 +1,11 @@
 # Değişiklikler
 
+## 0.1.2 — para eki
+
+- Para ekinin uyumu: ek "TL"ye göre yazılır, okunuşta lira / kuruşa uydurulur (`10,50 TL'den` → "on lira elli
+  kuruştan", `20 TL'ye` → "yirmi liraya"; önceden "kuruşden", "liraye"). `eki_uydur()` ünlü uyumu, sertleşme ve
+  kaynaştırma harfi düşmesiyle.
+
 ## 0.1.1 — belgeler
 
 - README ve CHANGELOG koda göre güncellendi (kurulum, kullanım, API, düzen); kod davranışı değişmedi.

@@ -413,7 +413,9 @@ def araliklari_oku(metin: str) -> str:
 # 12–14) Para, yüzde, kısaltmalar
 # --------------------------------------------------------------------------
 
-_PARA = re.compile(r"\b([\d.]+?)(?:,(\d{1,2}))?\s?(?:₺|TL\b|lira\b)", _A)
+# Kesmeden sonraki ek "TL"ye ("tele") göre yazılır (TL'den, TL'ye); okunuşta "lira" / "kuruş"a uydurulur
+_PARA = re.compile(r"\b([\d.]+?)(?:,(\d{1,2}))?\s?(?:₺|TL\b|lira\b)(?:['’]([a-zA-ZçğıöşüÇĞİÖŞÜ]+))?", _A)
+_UNLU = "aeıioöuü"
 # Sayı: binlik gruplu ya da düz; "[\d.]+" cümle sonu noktasını da yutuyordu ("%18." → nokta kayboluyordu)
 _YUZDE = re.compile(r"%\s?(\d{1,3}(?:\.\d{3})+|\d+)(?:,(\d+))?", _A)
 _SOZLUK_DESENLERI = [
@@ -423,11 +425,36 @@ _SOZLUK_DESENLERI = [
 ]
 
 
+def eki_uydur(kelime: str, ek: str) -> str:
+    """Eki kelimeye ünlü ve ünsüz uyumuyla uydurur: ("lira", "den") -> "dan", ("kuruş", "den") -> "tan",
+    ("kuruş", "yi") -> "u" (ünsüzle biten kelimede kaynaştırma harfi düşer), ("lira", "lik") -> "lık"."""
+    ek = turkce_kucuk(ek)
+    son = next((c for c in reversed(kelime) if c in _UNLU), "e")
+    kalin, yuvarlak = son in "aıou", son in "oöuü"
+    if kelime[-1] not in _UNLU:
+        if len(ek) > 1 and ek[0] in "yns" and ek[1] in _UNLU:
+            ek = ek[1:]
+        if kelime[-1] in "fstkçşhp" and ek[0] in "dc":
+            ek = {"d": "t", "c": "ç"}[ek[0]] + ek[1:]
+    cikti = []
+    for h in ek:
+        if h in "ea":
+            h, yuvarlak = ("a" if kalin else "e"), False
+        elif h in "ıiuü":
+            h = {(True, True): "u", (True, False): "ı", (False, True): "ü", (False, False): "i"}[(kalin, yuvarlak)]
+        elif h in "oö":
+            kalin, yuvarlak = h == "o", True
+        cikti.append(h)
+    return "".join(cikti)
+
+
 def _para_oku(e: re.Match) -> str:
     cikti = f"{sayi_oku(sayiyi_coz(e.group(1)))} lira"
-    kurus = e.group(2)
+    kurus, ek = e.group(2), e.group(3)
     if kurus and int(kurus):
         cikti += f" {sayi_oku(kurus)} kuruş"
+    if ek:
+        cikti += eki_uydur(cikti.rsplit(" ", 1)[-1], ek)
     return cikti
 
 
