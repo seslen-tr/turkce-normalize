@@ -120,6 +120,8 @@ isaretleri_temizle("Sorgu bitti. [dur:0.8] Toplam.")   # altyazı için
 
 Gömülü sözlük CBS ve yazılım jargonunu Türk kulağına doğru gelen yazımla
 değiştirir (`shapefile` → `şeypfayl`, `WMS` → `ve me se`, `API` → `ey pi ay`).
+Sık geçen yabancı adları da Türkçedeki okunuşuyla yazar (`YABANCI_ADLAR`: `Michael Jackson'ın` → Maykıl
+Ceksının, `Sophie` → Sofi, `New York` → Nevyork); Türkçe adla karışabilenler (Can, Mark) sözlükte yok.
 Kendi terimlerini ekleyebilirsin:
 
 ```python
@@ -301,7 +303,7 @@ içinde `normalizasyon_sinavi` olarak başka sistemlerin ölçülmesi için de y
 | `turkce_normalize/normalize.py` | `normalize()` ve kural sırası; kısaltma, birim, Roma rakamı, kesir, aralık, simge, e-posta/adres kuralları |
 | `turkce_normalize/sayilar.py` | sayı, sıra sayısı, ondalık okuma; harf adları, bulunma eki, Türkçe büyük/küçük harf |
 | `turkce_normalize/cografi.py` | koordinat, ölçek, pafta, EPSG/UTM, alan birimleri |
-| `turkce_normalize/telaffuz.py` | gömülü CBS/yazılım telaffuz sözlüğü, `sozluk_birlestir` |
+| `turkce_normalize/telaffuz.py` | gömülü CBS/yazılım telaffuz sözlüğü, yabancı adlar, `sozluk_birlestir` |
 | `turkce_normalize/cumle.py` | kısaltma farkında cümle ayırıcı (LLM akışı) |
 | `turkce_normalize/isaretler.py` | `[dur]` duraklama işaretleri |
 | `turkce_normalize/__main__.py` | komut satırı |

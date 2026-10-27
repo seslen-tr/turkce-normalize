@@ -24,9 +24,9 @@ from .sayilar import (
     HARF_OKUNUSU, bulunma_eki, harf_oku, ondalik_oku, rakamlari_tek_tek,
     sayi_oku, sayiyi_coz, sira_oku, turkce_buyuk, turkce_kucuk,
 )
-from .telaffuz import CBS_TERIMLERI, VARSAYILAN_SOZLUK, sozluk_birlestir, telaffuz_uygula
+from .telaffuz import CBS_TERIMLERI, VARSAYILAN_SOZLUK, YABANCI_ADLAR, sozluk_birlestir, telaffuz_uygula
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 __all__ = [
     "normalize",
@@ -38,7 +38,7 @@ __all__ = [
     "kesirleri_oku", "araliklari_oku", "kisaltmalari_oku", "roma_coz",
     # sözlükler
     "KISALTMALAR", "BIRIMLER", "KELIME_GIBI_OKUNANLAR", "BILINEN_KELIMELER",
-    "ROMA_KARA_LISTE", "CBS_TERIMLERI", "VARSAYILAN_SOZLUK", "sozluk_birlestir",
+    "ROMA_KARA_LISTE", "CBS_TERIMLERI", "YABANCI_ADLAR", "VARSAYILAN_SOZLUK", "sozluk_birlestir",
     # cümle ayırıcı
     "CumleAyirici", "cumleleri_ayir", "cumle_akisi", "cumle_akisi_async",
     # işaretler

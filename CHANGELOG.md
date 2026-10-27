@@ -1,5 +1,11 @@
 # Değişiklikler
 
+## 0.1.3 — yabancı adlar
+
+- Gömülü sözlüğe sık geçen yabancı kişi, yer ve marka adları eklendi (`YABANCI_ADLAR`, 87 ad): `Michael
+  Jackson'ın` → "Maykıl Ceksının", `Sophie` → "Sofi", `Kenji` → "Kenci", `New York` → "Nevyork". Önceden Türkçe
+  harf okunuşuyla okunuyordu ("miça cakson", "sopiye"). Türkçe adla karışabilenler (Can, Mark, Jean) eklenmedi.
+
 ## 0.1.2 — para eki
 
 - Para ekinin uyumu: ek "TL"ye göre yazılır, okunuşta lira / kuruşa uydurulur (`10,50 TL'den` → "on lira elli

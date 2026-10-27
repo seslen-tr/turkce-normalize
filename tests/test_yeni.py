@@ -289,3 +289,17 @@ class ParaEki(unittest.TestCase):
 
     def test_zaten_uyumlu(self):
         self.assertEqual(normalize("3.500 lira'dan"), "üç bin beş yüz liradan")
+
+
+class YabanciAdlar(unittest.TestCase):
+    def test_kisi(self):
+        self.assertEqual(normalize("Michael Jackson'ın şarkıları"), "Maykıl Ceksının şarkıları")
+        self.assertEqual(normalize("Johannes, Sophie ve Kenji"), "Yohannes, Sofi ve Kenci")
+
+    def test_yer_ve_marka(self):
+        self.assertEqual(normalize("New York'tan döndü."), "Nevyorktan döndü.")
+        self.assertEqual(normalize("Steve Jobs iPhone'u tanıttı."), "Stiv Cobs Ayfonu tanıttı.")
+
+    def test_turkce_ad_dokunulmaz(self):
+        self.assertEqual(normalize("Can ve Mark geldi."), "Can ve Mark geldi.")
+        self.assertEqual(normalize("Billur"), "Billur")       # "bill" sözcük içinde değişmez

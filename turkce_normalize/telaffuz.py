@@ -77,6 +77,34 @@ CBS_TERIMLERI: TelaffuzSozlugu = {
     "chatbot": "çetbot",
 }
 
+#: Metinde sık geçen yabancı adlar (kişi, yer, marka), Türkçede yerleşik okunuşlarıyla. Ek kesme işaretinden sonra
+#: kalır: "Jackson'ın" → "Ceksın'ın". Türkçe sözcük ya da adla karışabilenler bilerek yok (Can, Mark, Jean, Real…).
+YABANCI_ADLAR: TelaffuzSozlugu = {
+    # İngilizce kişi adları
+    "michael": "Maykıl", "jackson": "Ceksın", "john": "Con", "george": "Corc", "james": "Ceyms",
+    "william": "Vilyım", "thomas": "Tomas", "joseph": "Cozef", "harry": "Heri", "steve": "Stiv",
+    "jobs": "Cobs", "bill": "Bil", "gates": "Geyts", "elon": "İlon", "musk": "Mask", "zuckerberg": "Zakırberg",
+    "jennifer": "Cenifır", "jessica": "Cesika", "michelle": "Mişel", "sarah": "Sera", "emily": "Emili",
+    "elizabeth": "Elizabet", "johnson": "Consın", "smith": "Smit", "brown": "Braun", "taylor": "Teylır",
+    "wilson": "Vilsın", "shakespeare": "Şekspir", "newton": "Nivtın", "sherlock": "Şörlok", "holmes": "Holms",
+    "potter": "Pottır", "beyoncé": "Biyonse", "shakira": "Şakira",
+    # Fransızca, Almanca, İspanyolca, Japonca
+    "sophie": "Sofi", "jacques": "Jak", "pierre": "Piyer", "marie": "Mari", "louis": "Lui",
+    "hugo": "Hügo", "jules": "Jül", "verne": "Vern", "camus": "Kamü", "voltaire": "Volter", "rousseau": "Ruso",
+    "descartes": "Dekart", "chopin": "Şopen", "johannes": "Yohannes", "jürgen": "Yürgen", "wolfgang": "Volfgang",
+    "mozart": "Motsart", "beethoven": "Betoven", "goethe": "Göte", "nietzsche": "Niçe", "freud": "Froyd",
+    "einstein": "Aynştayn", "schmidt": "Şmit", "schumacher": "Şumahır", "juan": "Huan", "josé": "Hose",
+    "jorge": "Horhe", "javier": "Havyer", "kenji": "Kenci", "hiroshi": "Hiroşi",
+    # Yerler ve kulüpler
+    "washington": "Vaşington", "new york": "Nevyork", "chicago": "Şikago", "los angeles": "Los Anceles",
+    "seattle": "Siyatıl", "houston": "Hyustın", "manchester": "Mançestır", "liverpool": "Liverpul",
+    "chelsea": "Çelsi", "juventus": "Yuventus", "barcelona": "Barselona", "leipzig": "Laypzig",
+    "zürich": "Zürih", "bordeaux": "Bordo",
+    # Markalar
+    "google": "Gugıl", "facebook": "Feysbuk", "youtube": "Yutub", "whatsapp": "Vatsap", "iphone": "Ayfon",
+    "microsoft": "Maykrosoft", "windows": "Vindovs", "netflix": "Netfliks", "twitter": "Tivitır",
+}
+
 
 def sozluk_birlestir(*sozlukler: TelaffuzSozlugu) -> TelaffuzSozlugu:
     """Sözlükleri birleştirir; sonraki gelenler öncekini ezer.
@@ -93,7 +121,7 @@ def sozluk_birlestir(*sozlukler: TelaffuzSozlugu) -> TelaffuzSozlugu:
 
 
 #: Pakete gömülü varsayılan sözlük.
-VARSAYILAN_SOZLUK: TelaffuzSozlugu = sozluk_birlestir(CBS_TERIMLERI)
+VARSAYILAN_SOZLUK: TelaffuzSozlugu = sozluk_birlestir(CBS_TERIMLERI, YABANCI_ADLAR)
 
 # Derlenmiş desenler sözlük içeriğine göre önbelleğe alınır; normalize() her
 # cümlede çağrılır, her seferinde yüzlerce desen derlemek boşa iş olur.
