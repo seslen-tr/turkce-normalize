@@ -183,7 +183,7 @@ class Simgeler(unittest.TestCase):
         self.assertEqual(normalize("3 + 5 = 8"), "üç artı beş eşittir sekiz")
 
     def test_ve_isareti(self):
-        self.assertEqual(normalize("Ar-Ge & Pazarlama"), "Ar-Ge ve Pazarlama")
+        self.assertEqual(normalize("Ar-Ge & Pazarlama"), "Ar Ge ve Pazarlama")   # sözcük içi tire duraklama değil (0.1.4)
 
     def test_derece(self):
         self.assertEqual(normalize("Hava 25°C, gece -3 °C."), "Hava yirmi beş derece, gece eksi üç derece.")

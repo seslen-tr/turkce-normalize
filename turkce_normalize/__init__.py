@@ -9,6 +9,7 @@ rakamlarını, kesirleri, e-posta ve web adreslerini Türkçe okunuşlarına
     >>> normalize("Toplantı 14:30'da, %18 KDV dahil 1.250,50 ₺.")
     'Toplantı on dört otuzda, yüzde on sekiz katma değer vergisi dahil bin iki yüz elli lira elli kuruş.'
 """
+from .belge import okunur_metin, paragraflar, uzun_cumleyi_bol, virgulden_bol
 from .cografi import cografi_uygula
 from .cumle import CumleAyirici, cumle_akisi, cumle_akisi_async, cumleleri_ayir
 from .isaretler import (
@@ -24,12 +25,17 @@ from .sayilar import (
     HARF_OKUNUSU, bulunma_eki, harf_oku, ondalik_oku, rakamlari_tek_tek,
     sayi_oku, sayiyi_coz, sira_oku, turkce_buyuk, turkce_kucuk,
 )
+from .teknik import BIRIM_OKUNUSU, TEKNIK_KISALTMALAR, TEKNIK_TERIMLER, teknik_uygula
 from .telaffuz import CBS_TERIMLERI, VARSAYILAN_SOZLUK, YABANCI_ADLAR, sozluk_birlestir, telaffuz_uygula
 
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 
 __all__ = [
     "normalize",
+    # belge (Markdown / HTML → okunur metin)
+    "okunur_metin", "paragraflar", "uzun_cumleyi_bol", "virgulden_bol",
+    # teknik metin
+    "teknik_uygula", "TEKNIK_KISALTMALAR", "TEKNIK_TERIMLER", "BIRIM_OKUNUSU",
     # sayılar
     "sayi_oku", "sira_oku", "ondalik_oku", "rakamlari_tek_tek", "sayiyi_coz",
     "bulunma_eki", "harf_oku", "turkce_buyuk", "turkce_kucuk", "HARF_OKUNUSU",

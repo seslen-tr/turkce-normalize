@@ -146,8 +146,18 @@ def cografi_uygula(metin: str) -> str:
     # 7) UTM dilimi — UTM 35N
     m = _UTM.sub(_utm_oku, m)
 
-    # 8) Alan ve uzunluk birimleri — yalnızca rakamın ardından
+    # 8) Alan ve uzunluk birimleri — yalnızca rakamın ardından; rakam bir ada bitişikse ölçü değildir
+    #    ("Qwen2.5 da karşılaştırıldı": "da" bağlaç, 0.1.3'e kadar "dekar" okunuyordu)
     for desen, okunus in _OLCU:
-        m = desen.sub(okunus, m)
+        m = desen.sub(lambda e, o=okunus: e.group(0) if _ada_bitisik(e) else o, m)
 
     return m
+
+
+def _ada_bitisik(e: re.Match) -> bool:
+    i = e.start()
+    if i > 0 and e.string[i - 1].isspace():                 # sayı ile birim arasındaki boşluk
+        i -= 1
+    while i > 0 and (e.string[i - 1].isdigit() or e.string[i - 1] in ".,"):
+        i -= 1
+    return i > 0 and e.string[i - 1].isalpha()

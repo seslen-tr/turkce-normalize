@@ -43,6 +43,7 @@ from .sayilar import (
     bulunma_eki, harf_oku, ondalik_oku, rakamlari_tek_tek, sayi_oku,
     sayiyi_coz, sira_oku, turkce_kucuk,
 )
+from .teknik import TEKNIK_KISALTMALAR, okunabilir, teknik_uygula
 from .telaffuz import VARSAYILAN_SOZLUK, TelaffuzSozlugu, telaffuz_uygula
 
 AYLAR = ["", "ocak", "şubat", "mart", "nisan", "mayıs", "haziran",
@@ -282,7 +283,8 @@ _SAAT_NOKTALI = re.compile(r"(?<=\b[Ss]aat )([01]?\d|2[0-3])\.([0-5]\d)\b")
 # Sürüm numarası: noktalı ve en az üç grup; grupların hepsi üç rakamlı değilse binlik değildir ("1.2.3").
 _SURUM = re.compile(r"(?<![\d.,])\d+(?:\.\d+){2,}(?![\d.])", _A)
 # İngilizce usulü ondalık nokta: ardında tam 3 rakam yoksa binlik ayırıcı değildir ("3.5", "2.75").
-_NOKTALI_ONDALIK = re.compile(r"(?<![\d.,])(\d+)\.(\d{1,2}|\d{4,})(?![\d.])", _A)
+#  Cümle sonu noktası ondalığı bozmaz ("ODbL 1.0." eskiden binlik sanılıp "on" okunuyordu, 0.1.4).
+_NOKTALI_ONDALIK = re.compile(r"(?<![\d.,])(\d+)\.(\d{1,2}|\d{4,})(?!\d|\.\d)", _A)
 _SAAT = re.compile(r"\b([01]?\d|2[0-3]):([0-5]\d)\b", _A)
 
 
@@ -522,14 +524,29 @@ def _buyuk_harfli_cumlede(e: re.Match) -> bool:
     return any(k is not None and k.group(1) in BILINEN_KELIMELER for k in komsular)
 
 
+def _ek_ekle(okunus: str, ek: str) -> str:
+    """Kısaltmanın okunuşuna eki uydurur: ünlü uyumu ve ünlüyle biten okunuşta kaynaştırma harfi ("CBS'e" →
+    "ce be seye", 0.1.4'e kadar "ce be see"). Yazarın eki okunuşa göre yazdığı durumda değişmez ("TBMM'de")."""
+    if not ek:
+        return okunus
+    son = okunus.rsplit(" ", 1)[-1]
+    if son[-1] in _UNLU and ek[0] in _UNLU:
+        return okunus + eki_uydur(son, "y" + ek)
+    return okunus + ek
+
+
 def _kisaltma_oku(e: re.Match) -> str:
     kelime, ek = e.group(1), turkce_kucuk(e.group(2) or "")
+    if kelime in TEKNIK_KISALTMALAR and not _buyuk_harfli_cumlede(e):
+        return _ek_ekle(TEKNIK_KISALTMALAR[kelime], ek)       # "LLM'ler" -> "elelemler"
     if kelime in KELIME_GIBI_OKUNANLAR:
         return turkce_kucuk(kelime) + ek             # "NATO'ya" -> "natoya"
     if (len(kelime) > 5 or kelime in BILINEN_KELIMELER or _YALNIZ_ROMA.match(kelime)
             or _buyuk_harfli_cumlede(e)):
         return e.group(0)
-    return _harf_harf(kelime) + ek                   # "TBMM'de" -> "te be me mede"
+    if okunabilir(kelime):
+        return turkce_kucuk(kelime) + ek             # "EVREN'in" -> "evrenin", "TÜİK" -> "tüik" (0.1.4)
+    return _ek_ekle(_harf_harf(kelime), ek)          # "TBMM'de" -> "te be me mede", "CBS'e" -> "ce be seye"
 
 
 def kisaltmalari_oku(metin: str) -> str:
@@ -545,6 +562,7 @@ _SIRA = re.compile(r"(?<![A-Za-z0-9_])(\d+)\.(?=\s+([^\W\d_]))")
 _ONDALIK = re.compile(r"\b([\d.]+),(\d+)\b", _A)
 _TAM_SAYI = re.compile(r"\b\d[\d.]*\b", _A)
 _KESME = re.compile(r"(?<=[^\W_])['’](?=[^\W\d_])")
+_UNLU_KESME_UNLU = re.compile(r"([^\W\d_]+)['’]([aeıioöuü][^\W\d_]*)")
 
 
 def _sira_oku(e: re.Match) -> str:
@@ -597,7 +615,12 @@ def normalize(
 
     # 4) Telaffuz sözlüğü — sayı kurallarından önce, yoksa "wgs84" gibi
     #    terimlerin içindeki rakam bölünür ve terim yakalanmaz.
-    m = telaffuz_uygula(m, VARSAYILAN_SOZLUK if telaffuz is None else telaffuz)
+    sozluk = VARSAYILAN_SOZLUK if telaffuz is None else telaffuz
+    m = telaffuz_uygula(m, sozluk)
+
+    # 4b) Teknik yazımlar (teknik.py): sürüm, sözcük içi tire, harf-rakam bitişiği, birim, "+" ve "→". Sonra
+    #     sözlük bir kez daha: ayrılınca ortaya çıkan terimler de ("qwen3.8" → "qwen") yakalansın.
+    m = telaffuz_uygula(teknik_uygula(m), sozluk)
 
     # 5) IBAN — harfler ve rakamlar tek tek
     m = _IBAN.sub(_iban_oku, m)
@@ -654,7 +677,10 @@ def normalize(
     # 19) Kalan tam sayılar — 1.250 / 42
     m = _TAM_SAYI.sub(lambda e: sayi_oku(sayiyi_coz(re.sub(r"\.$", "", e.group(0)))), m)
 
-    # 20) Kesme işaretini kaldır — "14:30'da" -> "on dört otuzda"
+    # 20) Kesme işaretini kaldır — "14:30'da" -> "on dört otuzda". Okunuşu ünlüyle biten yazıma ünlüyle başlayan
+    #     ek gelmişse kaynaştırma harfi girer ("PDF'i" → "pe de feyi"; doğru yazılmış ekte zaten var: "Ankara'ya")
+    m = _UNLU_KESME_UNLU.sub(lambda e: e.group(1) + eki_uydur(e.group(1), "y" + e.group(2))
+                             if turkce_kucuk(e.group(1)[-1]) in _UNLU else e.group(0), m)
     m = _KESME.sub("", m)
 
     return re.sub(r"\s{2,}", " ", m).strip()

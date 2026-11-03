@@ -20,6 +20,8 @@ from __future__ import annotations
 import re
 from typing import Dict, List, Tuple
 
+from .teknik import TEKNIK_TERIMLER
+
 TelaffuzSozlugu = Dict[str, str]
 
 #: CBS ve yazılım jargonu.
@@ -121,7 +123,7 @@ def sozluk_birlestir(*sozlukler: TelaffuzSozlugu) -> TelaffuzSozlugu:
 
 
 #: Pakete gömülü varsayılan sözlük.
-VARSAYILAN_SOZLUK: TelaffuzSozlugu = sozluk_birlestir(CBS_TERIMLERI, YABANCI_ADLAR)
+VARSAYILAN_SOZLUK: TelaffuzSozlugu = sozluk_birlestir(CBS_TERIMLERI, YABANCI_ADLAR, TEKNIK_TERIMLER)
 
 # Derlenmiş desenler sözlük içeriğine göre önbelleğe alınır; normalize() her
 # cümlede çağrılır, her seferinde yüzlerce desen derlemek boşa iş olur.

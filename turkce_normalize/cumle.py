@@ -27,6 +27,7 @@ KISALTMALAR = {
 _SONLANDIRICI = re.compile(r"[.!?…]+[\s\"'»)]*")
 _KISALTMA_SONU = re.compile(r"([^\W_]+)\.\s*$")
 _SAYI_SONU = re.compile(r"\d\.\s*$")
+_YALNIZ_NUMARA = re.compile(r"^\s*\d{1,3}\.[\s\"'“”‘’«»]*$")
 
 _PENCERE = 64
 
@@ -64,10 +65,15 @@ class CumleAyirici:
             if kisaltma is not None and kisaltma.start() == 0 and aday[-_PENCERE - 1:-_PENCERE].isalnum():
                 kisaltma = None      # pencereye sığmayan uzun kelime, kısaltma olamaz
 
+            sonraki = self._tampon[son:son + 1]
             bekle = (
                 (kisaltma is not None and turkce_kucuk(kisaltma.group(1)) in KISALTMALAR)  # "Dr. Ayşe"
                 or _SAYI_SONU.search(kuyruk) is not None                                   # "15.03.2026"
                 or len(aday.strip()) < self.min_uzunluk                                    # "Evet."
+                # ardından küçük harf: cümle bitmedi ("XX. yüzyıl", "vb. şeyler"; 0.1.4)
+                or (sonraki.isalpha() and sonraki == turkce_kucuk(sonraki) and eslesme.group(0)[0] == ".")
+                # yalnız sıra numarası: '2. "Bilmiyorum…"' bölünüp tek başına "iki." okunuyordu (04.11)
+                or _YALNIZ_NUMARA.match(aday) is not None
             )
 
             if bekle:
