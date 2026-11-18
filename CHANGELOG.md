@@ -1,6 +1,8 @@
 # Değişiklikler
 
-## Yayımlanmamış
+## 0.1.8 — noktalı kuruş
+
+İlk dış katkı: Doruk Dumlu (#1).
 
 - Noktalı ondalık tutar kuruşla okunur: `2450.75 TL` → "iki bin dört yüz elli lira yetmiş beş kuruş", `12.50₺` →
   "on iki lira elli kuruş" (önceden nokta binlik sanılıyordu: "iki yüz kırk beş bin yetmiş beş lira", "bin iki yüz
