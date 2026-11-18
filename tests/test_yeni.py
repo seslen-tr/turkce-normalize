@@ -324,6 +324,30 @@ class ParaEki(unittest.TestCase):
         self.assertEqual(normalize("12.500 TL"), "on iki bin beş yüz lira")
         self.assertEqual(normalize("1.000.000 TL"), "bir milyon lira")
 
+    def test_doviz(self):
+        # simge ardında ya da önünde; alt birim sent / peni; avro TDK yazımı
+        self.assertEqual(normalize("100 $"), "yüz dolar")
+        self.assertEqual(normalize("$100'den"), "yüz dolardan")
+        self.assertEqual(normalize("25 € ödedi"), "yirmi beş avro ödedi")
+        self.assertEqual(normalize("1.250,50 EUR'dan"), "bin iki yüz elli avro elli sentten")
+        self.assertEqual(normalize("10,5 GBP'den"), "on sterlin elli peniden")
+        self.assertEqual(normalize("10 £"), "on sterlin")
+        self.assertEqual(normalize("2450.75 $"), "iki bin dört yüz elli dolar yetmiş beş sent")
+        self.assertEqual(normalize("$2,450.75"), "iki bin dört yüz elli dolar yetmiş beş sent")  # İngilizce yazım
+        self.assertEqual(normalize("€1.250,50"), "bin iki yüz elli avro elli sent")
+        self.assertEqual(normalize("0.99 €"), "doksan dokuz sent")
+        self.assertEqual(normalize("$5, $10 ve $20."), "beş dolar, on dolar ve yirmi dolar.")
+        self.assertEqual(normalize("1,5 milyon $"), "bir virgül beş milyon dolar")
+        self.assertEqual(normalize("EUR/USD paritesi"), "avro/dolar paritesi")
+
+    def test_doviz_eki(self):
+        # önde simgede ek sayıya göre yazılır ("25'e"); okunuşta birime uydurulur
+        self.assertEqual(normalize("€25'e"), "yirmi beş avroya")
+        self.assertEqual(normalize("€25'in"), "yirmi beş avronun")
+        self.assertEqual(normalize("$5'te"), "beş dolarda")
+        self.assertEqual(normalize("$2'ye"), "iki dolara")
+        self.assertEqual(normalize("5 €'ya"), "beş avroya")
+
     def test_zaten_uyumlu(self):
         self.assertEqual(normalize("3.500 lira'dan"), "üç bin beş yüz liradan")
 

@@ -1,5 +1,15 @@
 # Değişiklikler
 
+## 0.1.9 — döviz
+
+- Döviz okunur: `$`, `€`, `£`, `USD`, `EUR`, `GBP`, sayının ardında ya da önünde. `100 $` → "yüz dolar" (önceden
+  "yüz $"), `$100'den` → "yüz dolardan" (önceden "$yüz'den"), `25 €` → "yirmi beş avro", `10,5 GBP` → "on sterlin elli
+  peni", `$2,450.75` (İngilizce yazım) → "iki bin dört yüz elli dolar yetmiş beş sent", `1.250,50 EUR'dan` → "… avro
+  elli sentten" (önceden "virgül beş eurodan"). Avro TDK yazımı: `EUR` artık "avro" okunur ("euro" değil).
+- Önde simgede ek sayıya göre yazılır, okunuşta birime uydurulur: `€25'e` → "yirmi beş avroya", `$5'te` → "beş
+  dolarda". Para okuma `sayilar.py`'ye taşındı (`para_oku`, `tutar_oku`, `PARA_BIRIMLERI`); ek ekleme kuralı Roma
+  rakamıyla ortak (`ek_ekle`).
+
 ## 0.1.8 — noktalı kuruş
 
 İlk dış katkı: Doruk Dumlu (#1).

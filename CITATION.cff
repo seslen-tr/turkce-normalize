@@ -5,5 +5,5 @@ authors:
   - family-names: "Delibaş"
     given-names: "Mehmet Veysel"
 license: MIT
-version: 0.1.8
+version: 0.1.9
 keywords: [turkish, tts, speech-synthesis, nlp]

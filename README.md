@@ -141,6 +141,7 @@ Eşleşme büyük/küçük harf duyarsızdır; ek almış kelimeler (`APIyi`) b�
 | Ondalık | `3,5` / `3,05` | üç virgül beş / üç virgül sıfır beş |
 | Sıra sayısı | `3. madde` | üçüncü madde |
 | Para | `1.250,50 ₺`, `2.360 TL` | bin iki yüz elli lira elli kuruş |
+| Döviz | `25 €`, `$100'den`, `10,5 GBP` | yirmi beş avro, yüz dolardan, on sterlin elli peni |
 | Yüzde | `%18`, `% 18,5` | yüzde on sekiz |
 | Tarih | `15.03.2026`, `15/03/2026` | on beş mart iki bin yirmi altı |
 | Saat | `14:05`, `09:00'da` | on dört sıfır beş, dokuzda |

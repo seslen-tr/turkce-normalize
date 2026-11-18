@@ -41,7 +41,7 @@ from typing import Optional
 from .cografi import cografi_uygula
 from .sayilar import (
     bulunma_eki, harf_oku, harfleri_oku, ondalik_oku, rakamlari_tek_tek, sayi_oku,
-    eki_uydur, roma_coz, roma_ekli_oku, saat_oku, sayiyi_coz, sira_oku, tam_sayi_oku, turkce_kucuk,
+    eki_uydur, para_oku, roma_coz, roma_ekli_oku, saat_oku, sayiyi_coz, sira_oku, tam_sayi_oku, turkce_kucuk,
 )
 from .teknik import TEKNIK_KISALTMALAR, okunabilir, teknik_uygula
 from .telaffuz import VARSAYILAN_SOZLUK, TelaffuzSozlugu, telaffuz_uygula
@@ -56,7 +56,8 @@ KISALTMALAR = {
     "Sn.": "sayın", "No.": "numara", "Tel.": "telefon", "Fax.": "faks",
     "Mah.": "mahallesi", "Cad.": "caddesi", "Sok.": "sokak", "Apt.": "apartmanı",
     "vb.": "ve benzeri", "vs.": "vesaire", "vd.": "ve diğerleri", "bkz.": "bakınız",
-    "örn.": "örneğin", "TL": "lira", "USD": "dolar", "EUR": "euro",
+    "örn.": "örneğin", "TL": "lira", "USD": "dolar", "EUR": "avro", "GBP": "sterlin",
+    "₺": "lira", "$": "dolar", "€": "avro", "£": "sterlin",  # sayısız simge: "1,5 milyon $"
     "T.C.": "te ce", "TCKN": "te ce kimlik numarası", "IBAN": "i ban",
 }
 
@@ -418,8 +419,6 @@ def araliklari_oku(metin: str) -> str:
 # 12–14) Para, yüzde, kısaltmalar
 # --------------------------------------------------------------------------
 
-# Kesmeden sonraki ek "TL"ye ("tele") göre yazılır (TL'den, TL'ye); okunuşta "lira" / "kuruş"a uydurulur
-_PARA = re.compile(r"\b([\d.]+?)(?:,(\d{1,2}))?\s?(?:₺|TL\b|lira\b)(?:['’]([a-zA-ZçğıöşüÇĞİÖŞÜ]+))?", _A)
 _UNLU = "aeıioöuü"
 # Sayı: binlik gruplu ya da düz; "[\d.]+" cümle sonu noktasını da yutuyordu ("%18." → nokta kayboluyordu)
 _YUZDE = re.compile(r"%\s?(\d{1,3}(?:\.\d{3})+|\d+)(?:,(\d+))?", _A)
@@ -428,26 +427,6 @@ _SOZLUK_DESENLERI = [
     for sozluk in (KISALTMALAR, BIRIMLER)
     for kisa in sorted(sozluk, key=len, reverse=True)
 ]
-
-
-_NOKTALI_KURUS = re.compile(r"(\d+)\.(\d{1,2})")
-
-
-def _para_oku(e: re.Match) -> str:
-    tam, kurus, ek = e.group(1), e.group(2), e.group(3)
-    # "2450.75 TL": noktadan sonra 1-2 rakam binlik grup olamaz, İngilizce usulü kuruştur (önceden 245.075 lira)
-    noktali = _NOKTALI_KURUS.fullmatch(tam)
-    if noktali and not kurus:
-        tam, kurus = noktali.groups()
-    if kurus and len(kurus) == 1:
-        kurus += "0"  # "1,5 TL" bir lira elli kuruştur, beş kuruş değil
-    lira = sayiyi_coz(tam)
-    cikti = f"{sayi_oku(lira)} lira"
-    if kurus and int(kurus):  # "0,99 TL" → "doksan dokuz kuruş" ("sıfır lira" söylenmez)
-        cikti = (f"{cikti} " if lira else "") + f"{sayi_oku(kurus)} kuruş"
-    if ek:
-        cikti += eki_uydur(cikti.rsplit(" ", 1)[-1], ek)
-    return cikti
 
 
 def _yuzde_oku(e: re.Match) -> str:
@@ -649,8 +628,8 @@ def normalize(
     # 11) Eksi sayılar — "-5 derece" -> "eksi beş derece"
     m = _EKSI.sub("eksi ", m)
 
-    # 12) Para — 1.250,50 ₺ / 1.250,50 TL
-    m = _PARA.sub(_para_oku, m)
+    # 12) Para — 1.250,50 ₺ / 1.250,50 TL / 25 € / $100 (sayilar.para_oku)
+    m = para_oku(m)
 
     # 13) Yüzde — %18 / % 18,5
     m = _YUZDE.sub(_yuzde_oku, m)
