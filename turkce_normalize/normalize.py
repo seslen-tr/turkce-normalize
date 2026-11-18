@@ -430,11 +430,21 @@ _SOZLUK_DESENLERI = [
 ]
 
 
+_NOKTALI_KURUS = re.compile(r"(\d+)\.(\d{1,2})")
+
+
 def _para_oku(e: re.Match) -> str:
-    cikti = f"{sayi_oku(sayiyi_coz(e.group(1)))} lira"
-    kurus, ek = e.group(2), e.group(3)
-    if kurus and int(kurus):
-        cikti += f" {sayi_oku(kurus)} kuruş"
+    tam, kurus, ek = e.group(1), e.group(2), e.group(3)
+    # "2450.75 TL": noktadan sonra 1-2 rakam binlik grup olamaz, İngilizce usulü kuruştur (önceden 245.075 lira)
+    noktali = _NOKTALI_KURUS.fullmatch(tam)
+    if noktali and not kurus:
+        tam, kurus = noktali.groups()
+    if kurus and len(kurus) == 1:
+        kurus += "0"  # "1,5 TL" bir lira elli kuruştur, beş kuruş değil
+    lira = sayiyi_coz(tam)
+    cikti = f"{sayi_oku(lira)} lira"
+    if kurus and int(kurus):  # "0,99 TL" → "doksan dokuz kuruş" ("sıfır lira" söylenmez)
+        cikti = (f"{cikti} " if lira else "") + f"{sayi_oku(kurus)} kuruş"
     if ek:
         cikti += eki_uydur(cikti.rsplit(" ", 1)[-1], ek)
     return cikti

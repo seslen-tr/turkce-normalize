@@ -1,5 +1,14 @@
 # Değişiklikler
 
+## Yayımlanmamış
+
+- Noktalı ondalık tutar kuruşla okunur: `2450.75 TL` → "iki bin dört yüz elli lira yetmiş beş kuruş", `12.50₺` →
+  "on iki lira elli kuruş" (önceden nokta binlik sanılıyordu: "iki yüz kırk beş bin yetmiş beş lira", "bin iki yüz
+  elli lira"). Noktadan sonra üç rakam binlik kalır (`1.250 TL`).
+- Tek haneli kuruş onluktur: `1,5 TL` → "bir lira elli kuruş" (önceden "beş kuruş").
+- Tam kısım sıfırsa lira söylenmez: `0.99 TL` → "doksan dokuz kuruş" (önceden "doksan dokuz lira"), `0,50 TL'ye` →
+  "elli kuruşa". Sınır testleri: `99.9 TL`, `1.250,5 TL`, `12.500 TL`, `1.000.000 TL`.
+
 ## 0.1.7 — "dört" yumuşar, ekli Roma rakamı
 
 - Ünlüyle başlayan ekte "dört" "dörd" olur: `4'e` → "dörde", `%14'ü` → "yüzde on dördü", `3.14'e` → "üç virgül on
