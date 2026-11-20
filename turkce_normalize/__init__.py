@@ -28,7 +28,7 @@ from .sayilar import (
 from .teknik import BIRIM_OKUNUSU, TEKNIK_KISALTMALAR, TEKNIK_TERIMLER, teknik_uygula
 from .telaffuz import CBS_TERIMLERI, VARSAYILAN_SOZLUK, YABANCI_ADLAR, sozluk_birlestir, telaffuz_uygula
 
-__version__ = "0.1.9"
+__version__ = "0.1.10"
 
 __all__ = [
     "normalize",

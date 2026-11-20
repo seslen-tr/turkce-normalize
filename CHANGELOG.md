@@ -1,5 +1,10 @@
 # Değişiklikler
 
+## 0.1.10 — milattan önce / sonra
+
+- `M.Ö.` → "milattan önce", `M.S.` → "milattan sonra" (önceden yazıldığı gibi kalıyordu), `MÖ` → "milattan önce"
+  (önceden harf harf "meö"). Tek başına `MS` açılmaz (başka anlamları da var).
+
 ## 0.1.9 — döviz
 
 - Döviz okunur: `$`, `€`, `£`, `USD`, `EUR`, `GBP`, sayının ardında ya da önünde. `100 $` → "yüz dolar" (önceden

@@ -413,6 +413,13 @@ class SaatVeSifir(unittest.TestCase):
         self.assertEqual(normalize("CV'ni gönder"), "ceveni gönder")
         self.assertEqual(normalize("Mehmet V. Delibaş"), "Mehmet V. Delibaş")
 
+    def test_milattan_once_sonra(self):
+        # 20.11.2026: "M.Ö." yazıldığı gibi kalıyor, "MÖ" harf harf "meö" okunuyordu
+        self.assertEqual(normalize("Troya M.Ö. 1200 yılında yandı."), "Troya milattan önce bin iki yüz yılında yandı.")
+        self.assertEqual(normalize("Roma M.S. 476’da çöktü."), "Roma milattan sonra dört yüz yetmiş altıda çöktü.")
+        self.assertEqual(normalize("MÖ 3000’de yazı bulundu."), "milattan önce üç binde yazı bulundu.")
+        self.assertEqual(normalize("MS hastalığı"), "mese hastalığı")              # tek başına "MS" açılmaz
+
     def test_gram_birimleri(self):
         self.assertEqual(normalize("250 g un"), "iki yüz elli gram un")
         self.assertEqual(normalize("5 mg"), "beş miligram")

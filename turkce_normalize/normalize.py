@@ -59,6 +59,7 @@ KISALTMALAR = {
     "örn.": "örneğin", "TL": "lira", "USD": "dolar", "EUR": "avro", "GBP": "sterlin",
     "₺": "lira", "$": "dolar", "€": "avro", "£": "sterlin",  # sayısız simge: "1,5 milyon $"
     "T.C.": "te ce", "TCKN": "te ce kimlik numarası", "IBAN": "i ban",
+    "M.Ö.": "milattan önce", "M.S.": "milattan sonra", "MÖ": "milattan önce",   # "MS" tek başına başka şey de olur
 }
 
 BIRIMLER = {
